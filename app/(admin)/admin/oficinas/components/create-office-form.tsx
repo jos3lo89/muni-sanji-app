@@ -51,7 +51,7 @@ export const CreateOfficeForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      acronym: "", // Establece el valor por defecto como una cadena vacía
+      acronym: "",
       parentOfficeId: null,
     },
   });
@@ -153,6 +153,20 @@ export const CreateOfficeForm = () => {
 
           <FormField
             control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre de Oficina</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nombre de la oficina" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="acronym"
             render={({ field }) => (
               <FormItem>
@@ -163,20 +177,6 @@ export const CreateOfficeForm = () => {
                     {...field}
                     value={field.value || ""}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre de Oficina</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nombre de la oficina" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
