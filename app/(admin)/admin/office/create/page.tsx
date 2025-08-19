@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,34 +21,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import {
+  createFormSchema,
+  CreateOfficeFormValues,
+  ParentOffices,
+} from "@/schemas/offices.schema";
 
-// Esquema de validación para el formulario
-const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "El nombre debe tener al menos 3 caracteres.",
-  }),
-  acronym: z.string().optional().nullable(),
-  parentOfficeId: z.string().uuid().optional().nullable(),
-});
-
-type CreateOfficeFormValues = z.infer<typeof formSchema>;
-
-interface Office {
-  id: string;
-  name: string;
-}
-
-export const CreateOfficeForm = () => {
+const CreateOffice = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [offices, setOffices] = useState<Office[]>([]);
+  const [offices, setOffices] = useState<ParentOffices[]>([]);
   const [belongsToOffice, setBelongsToOffice] = useState(false);
+  const [isLoadingOffices, setIsLoadingOffices] = useState(false);
 
   const form = useForm<CreateOfficeFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(createFormSchema),
     defaultValues: {
       name: "",
       acronym: "",
@@ -56,50 +44,58 @@ export const CreateOfficeForm = () => {
     },
   });
 
-  useEffect(() => {
-    const fetchOffices = async () => {
-      try {
-        const res = await fetch("http://localhost:4000/api/v1/offices");
-        const data = await res.json();
-        setOffices(data);
-      } catch (error) {
-        console.error("Error fetching offices:", error);
+  const fetchOffices = async () => {
+    setIsLoadingOffices(true);
+    try {
+      const res = await fetch("/api/offices/parents");
+      if (!res.ok) {
+        throw new Error("Failed to fetch offices");
       }
-    };
-    fetchOffices();
-  }, []);
+      const data = await res.json();
+      console.log(data);
+
+      setOffices(data);
+    } catch (error) {
+      toast.error("Hubo un error al cargar las oficinas.");
+      console.error("Error fetching offices:", error);
+    } finally {
+      setIsLoadingOffices(false);
+    }
+  };
+
+  const handleSwitchChange = (checked: boolean) => {
+    setBelongsToOffice(checked);
+    if (checked) {
+      if (offices.length === 0) {
+        fetchOffices();
+      }
+    } else {
+      form.setValue("parentOfficeId", null);
+    }
+  };
 
   const onSubmit = async (values: CreateOfficeFormValues) => {
     try {
-      setLoading(true);
-      const res = await fetch("http://localhost:4000/api/v1/offices", {
+      const data = {
+        ...values,
+        isMainOffice: !belongsToOffice,
+        parentOfficeId: belongsToOffice ? values.parentOfficeId : null,
+      };
+      console.log(data);
+
+      const res = await fetch("/api/offices", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...values,
-          isMainOffice: !belongsToOffice,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
 
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || "Failed to create office");
-      }
-
-      toast.success("Oficina creada correctamente.", {
-        description: "Se ha creado una nueva oficina con éxito.",
-      });
-      router.push("/admin/oficinas");
-      router.refresh();
-    } catch (error: any) {
-      toast.error("Hubo un error al procesar la solicitud.", {
-        description:
-          error.message || "Verifica la información e intenta de nuevo.",
-      });
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error("Failed to create office");
+      toast.success("Oficina creada correctamente.");
+      router.push("/admin/office");
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) toast.error(error.message);
+      else toast.error("Hubo un error al procesar la solicitud.");
     }
   };
 
@@ -109,14 +105,16 @@ export const CreateOfficeForm = () => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <FormLabel>¿Pertenece a una oficina?</FormLabel>
+            <div className="space-y-0.5">
+              <FormLabel>¿Es una Sub-Oficina?</FormLabel>
+              <p className="text-sm text-muted-foreground">
+                Activa esto si la nueva oficina depende de otra ya existente.
+              </p>
+            </div>
             <FormControl>
               <Switch
                 checked={belongsToOffice}
-                onCheckedChange={(checked) => {
-                  setBelongsToOffice(checked);
-                  form.setValue("parentOfficeId", null);
-                }}
+                onCheckedChange={handleSwitchChange}
               />
             </FormControl>
           </FormItem>
@@ -127,14 +125,15 @@ export const CreateOfficeForm = () => {
               name="parentOfficeId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Oficina que pertenece</FormLabel>
+                  <FormLabel>Oficina Principal a la que pertenece</FormLabel>
                   <Select
-                    onValueChange={(value) => field.onChange(value)}
+                    onValueChange={field.onChange}
                     defaultValue={field.value || ""}
+                    disabled={isLoadingOffices}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona una oficina padre" />
+                        <SelectValue placeholder="Selecciona una oficina principal" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -156,9 +155,12 @@ export const CreateOfficeForm = () => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre de Oficina</FormLabel>
+                <FormLabel>Nombre de la Oficina</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nombre de la oficina" {...field} />
+                  <Input
+                    placeholder="Ej: Gerencia de Desarrollo Urbano"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,10 +172,10 @@ export const CreateOfficeForm = () => {
             name="acronym"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Acrónimo</FormLabel>
+                <FormLabel>Acrónimo (Opcional)</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Acrónimo (ej. GDU)"
+                    placeholder="Ej: GDU"
                     {...field}
                     value={field.value || ""}
                   />
@@ -183,11 +185,13 @@ export const CreateOfficeForm = () => {
             )}
           />
 
-          <Button disabled={loading} type="submit">
-            {loading ? "Cargando..." : "Agregar"}
+          <Button disabled={form.formState.isSubmitting} type="submit">
+            {form.formState.isSubmitting ? "Guardando..." : "Crear Oficina"}
           </Button>
         </form>
       </Form>
     </div>
   );
 };
+
+export default CreateOffice;
