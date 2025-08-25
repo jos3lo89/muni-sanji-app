@@ -1,0 +1,176 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------------------
+// ENUMS: Tipos de datos personalizados
+// --------------------------------------------------
+
+enum UserRole {
+  administrador
+  mesa_de_partes
+  funcionario
+}
+
+enum DocumentStatus {
+  creado
+  recibido
+  derivado
+  en_revision
+  observado
+  atendido
+  archivado
+  rechazado
+}
+
+enum ApplicantType {
+  natural
+  juridica
+}
+
+enum DocumentType {
+  CARTA
+  DIRECTIVA
+  EXPOSICI
+  N_DE_MOTIVOS
+  INFORME
+  MEMORANDO
+  MEMORANDO_MULTIPLE
+  NOTA_DE_ELEVACI
+  OFICIO
+  OFICIO_CIRCULAR
+  OFICIO_MULTIPLE
+  AYUDA_MEMORIA
+  OTROS
+  PROVEIDO
+  N_VICEMINISTERIAL
+  RESUMEN_EJECUTIVO
+  SOBRE_CERRADO
+  SOLICITUD
+}
+
+// --------------------------------------------------
+// MODELS: Representación de las tablas de la base de datos
+// --------------------------------------------------
+
+model Office {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  acronym      String?
+  isMainOffice Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  // Relación de jerarquía (auto-referencia)
+  parentOfficeId String?
+  parentOffice   Office?  @relation("OfficeHierarchy", fields: [parentOfficeId], references: [id])
+  subOffices     Office[] @relation("OfficeHierarchy")
+
+  // Relaciones con otros modelos
+  users       User[]
+  documents   Document[]        @relation("CurrentOfficeDocuments")
+  historyFrom DocumentHistory[] @relation("FromOfficeHistory")
+  historyTo   DocumentHistory[] @relation("ToOfficeHistory")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  dni          String   @unique
+  name         String
+  lastName     String
+  username     String   @unique
+  passwordHash String
+  role         UserRole
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  officeId String
+  office   Office @relation(fields: [officeId], references: [id])
+
+  historyActions DocumentHistory[]
+}
+
+model Document {
+  id           String  @id @default(uuid())
+  trackingCode String  @unique
+  futCode      String? @unique
+
+  // Datos del solicitante
+  applicantType       ApplicantType
+  applicantIdentifier String
+  applicantName       String
+  applicantLastname   String
+  applicantEmail      String
+  applicantPhone      String?
+  applicantAddress    String?
+
+  // Datos del documento
+  documentType DocumentType
+  subject      String
+  pageCount    Int
+
+  // Estado y ubicación actual
+  currentStatus   DocumentStatus @default(creado)
+  currentOfficeId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  currentOffice Office               @relation("CurrentOfficeDocuments", fields: [currentOfficeId], references: [id])
+  attachments   DocumentAttachment[]
+  history       DocumentHistory[]
+
+  // Índices para optimizar búsquedas
+  @@index([trackingCode])
+  @@index([futCode])
+  @@index([currentOfficeId])
+}
+
+model DocumentAttachment {
+  id         String   @id @default(uuid())
+  fileName   String
+  fileUrl    String
+  fileType   String // 'principal' o 'anexo'
+  uploadedAt DateTime @default(now())
+
+  // Relación con Document
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+model DocumentHistory {
+  id             String         @id @default(uuid())
+  statusAtMoment DocumentStatus
+  observation    String?
+  timestamp      DateTime       @default(now())
+
+  // Relaciones
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  fromOfficeId String?
+  fromOffice   Office? @relation("FromOfficeHistory", fields: [fromOfficeId], references: [id])
+
+  toOfficeId String
+  toOffice   Office @relation("ToOfficeHistory", fields: [toOfficeId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Índice para optimizar búsquedas por documento
+  @@index([documentId])
+}
