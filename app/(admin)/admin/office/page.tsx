@@ -25,7 +25,7 @@ const OfficesPage = async () => {
   return (
     <div className="container mx-auto mb-20">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-xl font-bold">Gestión de Oficinas</h1>
+        <h3 className="text-xl font-bold">Gestión de Oficinas</h3>
         <Button asChild>
           <Link href="/admin/office/create">Crear Nueva Oficina</Link>
         </Button>

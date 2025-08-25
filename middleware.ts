@@ -1,56 +1,64 @@
+import { auth } from "@/auth";
+import { NextAuthRequest } from "next-auth";
 import { NextResponse } from "next/server";
-import { auth } from "./auth";
-import { UserRole } from "@prisma/client";
 
-export default auth(async function middleware(req) {
-  // const { nextUrl } = req;
-  // const pathname = nextUrl.pathname;
+const roleRoutes = {
+  administrador: "/admin",
+  mesa_de_partes: "/reception-desk",
+  funcionario: "/manager",
+};
 
-  // const isLoggedIn = !!req.auth;
-  // const rol = req.auth?.user?.role as UserRole;
+// Rutas que no requieren autenticación.
+const publicRoutes = ["/signin"];
 
-  // const publicRoutes = ["/"];
-  // const authRoutess = ["/signin"];
-  // const adminRoutes = ["/admin", "/admin/office", "/admin/office/create"];
-  // const mesaDePartesRoutes = ["/mesa-de-partes"];
+export default auth((req: NextAuthRequest) => {
+  const { nextUrl } = req;
+  const userRole = req.auth?.user.role as keyof typeof roleRoutes | undefined;
+  const isAuth = !!req.auth;
+  const { pathname } = nextUrl;
 
-  // const isPublicRoute = publicRoutes.includes(pathname);
-  // const isAuthRoute = authRoutess.includes(pathname);
-  // const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
-  // const isMesaDePartesRoute = mesaDePartesRoutes.some((route) =>
-  //   pathname.startsWith(route)
-  // );
+  // Comprueba si la ruta actual es una de las protegidas.
+  const isProtectedRoute = Object.values(roleRoutes).some((route) =>
+    pathname.startsWith(route)
+  );
 
-  // const route = rol === "administrador" ? "/admin" : "/mesa-de-partes";
+  // CASO 1: Usuario no autenticado intenta acceder a una ruta protegida.
+  // ------------------------------------------------------------------
+  // Si no hay sesión y la ruta es protegida, redirige a signin.
+  if (!isAuth && isProtectedRoute) {
+    const newUrl = new URL("/signin", nextUrl.origin);
+    return NextResponse.redirect(newUrl);
+  }
 
-  // if (isPublicRoute) {
-  //   return NextResponse.next();
-  // }
+  // CASO 2: Usuario autenticado.
+  // ------------------------------------------------------------------
+  if (isAuth && userRole) {
+    const dashboardUrl = roleRoutes[userRole];
 
-  // if (isAuthRoute) {
-  //   if (isLoggedIn) {
-  //     return NextResponse.redirect(new URL(route, req.url));
-  //   }
-  //   return NextResponse.next();
-  // }
+    // 2.1: Si intenta acceder a la página de signin, redirígelo a su dashboard.
+    if (pathname === "/signin") {
+      const newUrl = new URL(dashboardUrl, nextUrl.origin);
+      return NextResponse.redirect(newUrl);
+    }
 
-  // if (!isLoggedIn) {
-  //   const redirectUrl = new URL("/signin", req.url);
-  //   redirectUrl.searchParams.set("callbackUrl", pathname);
-  //   return NextResponse.redirect(redirectUrl);
-  // }
+    // 2.2: Si está en la raíz, redirígelo a su dashboard.
+    if (pathname === "/") {
+      const newUrl = new URL(dashboardUrl, nextUrl.origin);
+      return NextResponse.redirect(newUrl);
+    }
 
-  // if (isAdminRoute && rol !== UserRole.administrador) {
-  //   return NextResponse.redirect(new URL(route, req.url));
-  // }
+    // 2.3: Si es una ruta protegida pero no es la que le corresponde,
+    //      redirígelo a su dashboard correcto.
+    if (isProtectedRoute && !pathname.startsWith(dashboardUrl)) {
+      const newUrl = new URL(dashboardUrl, nextUrl.origin);
+      return NextResponse.redirect(newUrl);
+    }
+  }
 
-  // if (isMesaDePartesRoute && rol !== UserRole.mesa_de_partes) {
-  //   return NextResponse.redirect(new URL(route, req.url));
-  // }
-
+  // Si ninguna de las condiciones anteriores se cumple, permite el acceso.
   return NextResponse.next();
 });
 
 export const config = {
-  matcher: ["/signin", "/admin/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

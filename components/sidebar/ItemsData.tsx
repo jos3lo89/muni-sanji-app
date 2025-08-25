@@ -33,11 +33,11 @@ export const sideBarData = {
         title: "Usuarios",
         url: "#",
         icon: UserPlus,
-        isActive: true,
+        isActive: false,
         items: [
           {
             title: "Usuarios",
-            url: "/admin/usuarios",
+            url: "/admin/user",
           },
           {
             title: "Registrar Usuario",
@@ -50,18 +50,18 @@ export const sideBarData = {
     mesa_de_partes: [
       {
         title: "Inicio",
-        url: "/private/attendance",
+        url: "/reception-desk",
         icon: Home,
       },
       {
-        title: "Asistencia",
+        title: "Documentos",
         url: "#",
         icon: UserPlus,
         isActive: true,
         items: [
           {
-            title: "Llamar lista",
-            url: "/private/attendance",
+            title: "entrantes",
+            url: "#",
           },
         ],
       },
@@ -69,9 +69,21 @@ export const sideBarData = {
 
     funcionario: [
       {
-        title: "Página Principal",
-        url: "/",
+        title: "Inicio",
+        url: "/manager",
         icon: Home,
+      },
+      {
+        title: "Documentos",
+        url: "#",
+        icon: UserPlus,
+        isActive: true,
+        items: [
+          {
+            title: "entrantes",
+            url: "#",
+          },
+        ],
       },
     ],
   },

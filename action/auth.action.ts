@@ -13,42 +13,42 @@ export const handleSignOut = async () => {
   redirect("/");
 };
 
-interface SignUpValues {
-  email: string;
-  password: string;
-  name: string;
-  lastName: string;
-  dni: string;
-  role: UserRole;
-  officeId: string;
-}
+// interface SignUpValues {
+//   email: string;
+//   password: string;
+//   name: string;
+//   lastName: string;
+//   dni: string;
+//   role: UserRole;
+//   officeId: string;
+// }
 
-const loginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(6),
-});
+// const loginSchema = z.object({
+//   email: z.email(),
+//   password: z.string().min(6),
+// });
 
-export const authenticate = async (formData: FormData) => {
-  try {
-    const values = Object.fromEntries(formData);
-    const result = loginSchema.safeParse(values);
+// export const authenticate = async (formData: FormData) => {
+//   try {
+//     const values = Object.fromEntries(formData);
+//     const result = loginSchema.safeParse(values);
 
-    console.log("sigin action: ", result);
+//     console.log("sigin action: ", result);
 
-    if (!result.success) {
-      throw new AuthError("faltan valors");
-    }
+//     if (!result.success) {
+//       throw new AuthError("faltan valors");
+//     }
 
-    const { email, password } = result.data;
+//     const { email, password } = result.data;
 
-    await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+//     await signIn("credentials", {
+//       email,
+//       password,
+//       redirect: false,
+//     });
 
-    // await new Promise((resolve) => setTimeout(resolve, 1500)); // Simular delay de red
-  } catch (error) {
-    console.log(error);
-  }
-};
+//     // await new Promise((resolve) => setTimeout(resolve, 1500)); // Simular delay de red
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };

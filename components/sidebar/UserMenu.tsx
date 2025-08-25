@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, Eye, LogOut, UserRound } from "lucide-react";
+import { ChevronsUpDown, LogOut, UserRound } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { Session } from "next-auth";
-import { useRouter } from "next/navigation";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
@@ -25,10 +24,9 @@ export function UserMenu({ user }: { user: Session["user"] }) {
     .map((p) => p.charAt(0).toUpperCase())
     .join("");
 
-  const router = useRouter();
   const logOut = async () => {
-    await signOut({ redirect: false });
-    router.push("/");
+    await signOut();
+    // router.push("/");
   };
 
   return (
