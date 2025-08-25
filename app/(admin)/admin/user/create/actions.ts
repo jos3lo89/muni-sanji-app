@@ -11,11 +11,11 @@ export interface FormState {
 
 export async function register(
   prevState: FormState,
-  formData: FormData
+  formData: FormData,
 ): Promise<FormState> {
   try {
     const validatedFields = UserCreateSchema.safeParse(
-      Object.fromEntries(formData.entries())
+      Object.fromEntries(formData.entries()),
     );
 
     if (!validatedFields.success) {

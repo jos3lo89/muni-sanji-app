@@ -1,10 +1,15 @@
+import DocumentSubmissionForm from "./components/DocumentSubmissionForm";
+import HeaderTitle from "./components/HeaderTitle";
+import NotaArchivos from "./components/NotaArchivos";
+import SendDocumentsTitle from "./components/SendDocumentsTitle";
+
 export default function Home() {
   return (
-    <div>
-      <h1>
-        mesa de aprte donde se sube docs mas datos m,as botn que ir a biscar mi
-        doc
-      </h1>
-    </div>
+    <>
+      <HeaderTitle />
+      <SendDocumentsTitle />
+      <DocumentSubmissionForm />
+      <NotaArchivos />
+    </>
   );
 }

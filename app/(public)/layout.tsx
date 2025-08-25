@@ -1,14 +1,13 @@
-import { ModeToggle } from "@/components/theme/ModeToggle";
+import FooterPublic from "./components/FooterPublic";
+import HeaderPublic from "./components/HeaderPublic";
 
 const PublicLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div>
-      <header>
-        <h1>Public</h1>
-        <ModeToggle />
-      </header>
+    <main className="min-h-screen bg-gray-50">
+      <HeaderPublic />
       {children}
-    </div>
+      <FooterPublic />
+    </main>
   );
 };
 export default PublicLayout;

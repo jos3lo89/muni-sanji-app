@@ -44,15 +44,13 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
   const [state, formAction] = useActionState(register, initialState);
 
   return (
-    <div className="flex items-center justify-center p-4">
-      <Card className="w-full max-w-2xl shadow-xl">
+    <div className="p-4 ">
+      <div className="mb-8 px-6">
+        <h3 className="text-xl font-bold">Registrar un nuevo usuario</h3>
+      </div>
+      <Card className="w-full max-w-xl mx-auto shadow-xl">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <User className="w-6 h-6 text-primary" />
-          </div>
-          <CardTitle className="text-2xl font-bold">
-            Registro de Usuario
-          </CardTitle>
+          <CardTitle></CardTitle>
           <CardDescription></CardDescription>
         </CardHeader>
 
@@ -93,6 +91,7 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                   id="name"
                   name="name"
                   placeholder="Ingrese su nombre"
+                  autoComplete="on"
                   required
                   className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                 />
@@ -106,6 +105,7 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                 <Input
                   id="lastName"
                   name="lastName"
+                  autoComplete="on"
                   placeholder="Ingrese sus apellidos"
                   required
                   className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
@@ -122,6 +122,7 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                 id="dni"
                 name="dni"
                 placeholder="Ingrese su DNI"
+                autoComplete="on"
                 required
                 className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
               />
@@ -134,7 +135,10 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                   Rol
                 </Label>
                 <Select name="role" defaultValue="administrador" required>
-                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                  <SelectTrigger
+                    id="role"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                  >
                     <SelectValue placeholder="Seleccione un rol" />
                   </SelectTrigger>
                   <SelectContent>
@@ -153,7 +157,10 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                   Oficina
                 </Label>
                 <Select name="officeId" required>
-                  <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-primary/20">
+                  <SelectTrigger
+                    id="officeId"
+                    className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                  >
                     <SelectValue placeholder="Seleccione una oficina" />
                   </SelectTrigger>
                   <SelectContent>
@@ -178,6 +185,7 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                 type="email"
                 placeholder="ejemplo@correo.com"
                 required
+                autoComplete="on"
                 className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -191,6 +199,7 @@ export function CreateUserForm({ offices }: CreateUserFormProps) {
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="off"
                 placeholder="Ingrese una contraseña segura"
                 required
                 className="transition-all duration-200 focus:ring-2 focus:ring-primary/20"

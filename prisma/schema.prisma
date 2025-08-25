@@ -43,20 +43,19 @@ enum ApplicantType {
 enum DocumentType {
   CARTA
   DIRECTIVA
-  EXPOSICIÓN_DE_MOTIVOS
+  EXPOSICI
+  N_DE_MOTIVOS
   INFORME
   MEMORANDO
   MEMORANDO_MULTIPLE
-  NOTA_DE_ELEVACIÓN
+  NOTA_DE_ELEVACI
   OFICIO
   OFICIO_CIRCULAR
   OFICIO_MULTIPLE
   AYUDA_MEMORIA
   OTROS
   PROVEIDO
-  RESOLUCIÓN
-  RESOLUCIÓN_JEFATURAL
-  RESOLUCIÓN_VICEMINISTERIAL
+  N_VICEMINISTERIAL
   RESUMEN_EJECUTIVO
   SOBRE_CERRADO
   SOLICITUD
@@ -96,12 +95,11 @@ model User {
   role         UserRole
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  // Relación con Office
   officeId String
   office   Office @relation(fields: [officeId], references: [id])
 
-  // Relación con DocumentHistory
   historyActions DocumentHistory[]
 }
 

@@ -1,8 +1,9 @@
+import Link from "next/link";
 import LoginForm from "../components/LoginForm";
 
 const SignIn = () => {
   return (
-    <div className="flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4 mt-10">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
@@ -24,6 +25,12 @@ const SignIn = () => {
 
         <div className="bg-card border border-border rounded-2xl shadow-xl p-8">
           <LoginForm />
+        </div>
+        <div className="text-center mt-8">
+          Volver al{" "}
+          <Link className="text-blue-500" href="/">
+            inicio
+          </Link>
         </div>
       </div>
     </div>

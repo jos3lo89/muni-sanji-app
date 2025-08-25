@@ -2,7 +2,7 @@ import { AppSidebar } from "@/components/sidebar/AppSidebar";
 import SideBarNavMenu from "@/components/sidebar/SidebarNavMenu";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+const ReceptionDeskLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -13,4 +13,4 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     </SidebarProvider>
   );
 };
-export default AdminLayout;
+export default ReceptionDeskLayout;

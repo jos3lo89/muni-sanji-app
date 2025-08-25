@@ -7,7 +7,7 @@ export async function NavUser() {
   const session = await auth();
 
   if (!session?.user) {
-    return <PacmanLoader color="#fff" />;
+    return <PacmanLoader color="#49b3a3" />;
   }
 
   return (
