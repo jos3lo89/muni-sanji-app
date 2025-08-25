@@ -45,7 +45,7 @@ const LoginForm = () => {
       </div>
       <div className="space-y-2">
         <Label htmlFor="email" className="text-sm font-medium text-foreground">
-          Correo electrónico
+          Correo electrónico <span className="text-red-800">*</span>
         </Label>
         <Input
           id="email"
@@ -63,7 +63,7 @@ const LoginForm = () => {
           htmlFor="password"
           className="text-sm font-medium text-foreground"
         >
-          Contraseña
+          Contraseña <span className="text-red-800">*</span>
         </Label>
         <Input
           id="password"
