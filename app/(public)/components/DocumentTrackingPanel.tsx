@@ -201,13 +201,13 @@ const DocumentTrackingPanel = () => {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+          {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-700">
               <strong>Nota:</strong> Los resultados de la búsqueda se mostrarán
               en la consola del navegador. Abre las herramientas de
               desarrollador (F12) para ver los detalles.
             </p>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
