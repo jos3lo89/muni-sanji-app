@@ -12,3 +12,13 @@ export const UserCreateSchema = z.object({
   role: z.enum(UserRole),
   officeId: z.uuid("Oficina inválida."),
 });
+
+export const UpdateUserSchema = z.object({
+  email: z.string().email("Email inválido."),
+  name: z.string().min(1, "El nombre no puede estar vacío."),
+  lastName: z.string().min(1, "El apellido no puede estar vacío."),
+  role: z.nativeEnum(UserRole),
+  officeId: z.string().uuid("Oficina inválida."),
+});
+
+export type UpdateUserFormValues = z.infer<typeof UpdateUserSchema>;
